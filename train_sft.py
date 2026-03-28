@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import inspect
 import json
 from pathlib import Path
 
@@ -118,23 +119,33 @@ def main() -> None:
         greater_is_better=False,
         bf16=torch.cuda.is_available(),
         report_to=["tensorboard"],
-        logging_dir=str(output_dir / "logs"),
         optim="paged_adamw_8bit",
         lr_scheduler_type="cosine",
         max_grad_norm=0.3,
         seed=args.seed,
     )
 
-    trainer = SFTTrainer(
-        model=model,
-        tokenizer=tokenizer,
-        args=training_args,
-        train_dataset=dataset["train"],
-        eval_dataset=dataset["validation"],
-        dataset_text_field="text",
-        max_seq_length=args.max_seq_length,
-        packing=False,
-    )
+    sft_signature = inspect.signature(SFTTrainer.__init__)
+    trainer_kwargs = {
+        "model": model,
+        "args": training_args,
+        "train_dataset": dataset["train"],
+        "eval_dataset": dataset["validation"],
+    }
+
+    if "tokenizer" in sft_signature.parameters:
+        trainer_kwargs["tokenizer"] = tokenizer
+    elif "processing_class" in sft_signature.parameters:
+        trainer_kwargs["processing_class"] = tokenizer
+
+    if "dataset_text_field" in sft_signature.parameters:
+        trainer_kwargs["dataset_text_field"] = "text"
+    if "max_seq_length" in sft_signature.parameters:
+        trainer_kwargs["max_seq_length"] = args.max_seq_length
+    if "packing" in sft_signature.parameters:
+        trainer_kwargs["packing"] = False
+
+    trainer = SFTTrainer(**trainer_kwargs)
 
     train_result = trainer.train()
     trainer.save_model()

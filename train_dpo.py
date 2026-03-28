@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import inspect
 from pathlib import Path
 
 import torch
@@ -83,14 +84,21 @@ def main() -> None:
         seed=args.seed,
     )
 
-    trainer = DPOTrainer(
-        model=model,
-        ref_model=None,
-        args=training_args,
-        train_dataset=dataset["train"],
-        eval_dataset=dataset["validation"],
-        tokenizer=tokenizer,
-    )
+    dpo_signature = inspect.signature(DPOTrainer.__init__)
+    trainer_kwargs = {
+        "model": model,
+        "ref_model": None,
+        "args": training_args,
+        "train_dataset": dataset["train"],
+        "eval_dataset": dataset["validation"],
+    }
+
+    if "tokenizer" in dpo_signature.parameters:
+        trainer_kwargs["tokenizer"] = tokenizer
+    elif "processing_class" in dpo_signature.parameters:
+        trainer_kwargs["processing_class"] = tokenizer
+
+    trainer = DPOTrainer(**trainer_kwargs)
 
     train_result = trainer.train()
     trainer.save_model()
