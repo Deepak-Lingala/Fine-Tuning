@@ -13,6 +13,7 @@ from peft import PeftModel
 from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 
 from src.structured_json_ft.prompts import SYSTEM_PROMPT, build_user_prompt
+from src.structured_json_ft.serialization import make_json_safe
 
 LABELER_PROMPT = """You are ranking structured JSON extraction outputs.
 Choose the best and worst answer for the given target.
@@ -46,7 +47,7 @@ def build_prompt(row: dict[str, Any], candidates: list[str]) -> str:
     payload = {
         "instruction": SYSTEM_PROMPT,
         "user_prompt": build_user_prompt(row["input_text"], row["schema_hint"]),
-        "target_json": row["target_json"],
+        "target_json": make_json_safe(row["target_json"]),
         "candidates": candidates,
     }
     return json.dumps(payload, ensure_ascii=True, indent=2)

@@ -11,6 +11,7 @@ from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 from trl import SFTTrainer
 
 from src.structured_json_ft.prompts import SYSTEM_PROMPT, build_user_prompt
+from src.structured_json_ft.serialization import make_json_safe
 
 
 def parse_args() -> argparse.Namespace:
@@ -41,7 +42,11 @@ def format_example(example: dict, tokenizer: AutoTokenizer) -> dict[str, str]:
         },
         {
             "role": "assistant",
-            "content": json.dumps(example["target_json"], ensure_ascii=True, separators=(",", ":")),
+            "content": json.dumps(
+                make_json_safe(example["target_json"]),
+                ensure_ascii=True,
+                separators=(",", ":"),
+            ),
         },
     ]
     rendered = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=False)

@@ -12,6 +12,7 @@ from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 
 from src.structured_json_ft.metrics import canonical_json, extract_json_block, field_level_f1, refusal_correct
 from src.structured_json_ft.prompts import SYSTEM_PROMPT, build_user_prompt
+from src.structured_json_ft.serialization import make_json_safe
 
 
 def parse_args() -> argparse.Namespace:
@@ -77,7 +78,7 @@ def evaluate_rows(rows: list[dict[str, Any]], model, tokenizer, max_new_tokens: 
     for row in rows:
         raw_output = generate_prediction(model, tokenizer, row["input_text"], row["schema_hint"], max_new_tokens)
         parsed = extract_json_block(raw_output)
-        target = row["target_json"]
+        target = make_json_safe(row["target_json"])
         valid_count += int(parsed is not None)
         exact_count += int(canonical_json(parsed) == canonical_json(target))
         refusal_count += int(refusal_correct(parsed, target))
