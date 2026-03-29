@@ -1,15 +1,2 @@
 __pycache__/
-.venv/
-*.pyc
-*.pyo
-*.pyd
 .env
-wandb/
-runs/
-outputs/
-checkpoints/
-artifacts/
-data/processed/
-data/dpo_pairs/
-results/*.json
-results/*.csv
