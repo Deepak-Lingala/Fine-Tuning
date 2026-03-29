@@ -1,0 +1,7 @@
+{
+  "dataset_name": "synthetic_medical_json_extraction",
+  "num_examples": 4000,
+  "seed": 42,
+  "schema": "medical_intake_v1",
+  "refusal_policy": "Return can_extract=false when input is non-medical or lacks extractable facts."
+}
