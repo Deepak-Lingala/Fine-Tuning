@@ -223,14 +223,6 @@ docker run -p 8000:8000 `
 - Refusal handling is easy to miss in synthetic data. The generator makes refusals explicit
   so the model learns when to decline instead of hallucinating a record.
 
-## Resume Bullets
-
-After you run the full experiment and confirm the reported numbers, you can use bullets like:
-
-- Fine-tuned Qwen2.5-3B with QLoRA for structured JSON extraction, improving exact match accuracy from 22% zero-shot to 68% after SFT and 74% after DPO on a held-out test set of 500 examples.
-- Applied DPO preference tuning using GPT-4o-mini as an automated labeler, generating 500 chosen/rejected pairs and improving JSON validity rate by 5 points over the SFT baseline.
-- Implemented refusal-correctness evaluation so the model learns to decline extraction when no structured medical facts are present.
-
 ## Important Note
 
 This workspace build includes the full code, dataset generator, metrics pipeline,
