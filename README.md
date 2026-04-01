@@ -211,22 +211,3 @@ docker run -p 8000:8000 `
   -e ADAPTER_PATH=outputs/dpo-qwen2.5-3b-json `
   structured-json-ft
 ```
-
-## What Went Wrong
-
-- Initial longer-run plan was `5` epochs, but the safer default is `3` because
-  this kind of narrow schema task overfits quickly.
-- DPO can become unstable when `beta` is too high. The project uses `beta=0.1`
-  because larger values often over-reward formatting quirks instead of factual correctness.
-- Medical extraction quality can look better than it really is if you measure only
-  JSON validity. That is why the evaluation script includes exact match and field-level F1.
-- Refusal handling is easy to miss in synthetic data. The generator makes refusals explicit
-  so the model learns when to decline instead of hallucinating a record.
-
-## Important Note
-
-This workspace build includes the full code, dataset generator, metrics pipeline,
-reference training-curve asset, and deployment setup. The metric values in the README
-and `results/metrics_comparison.md` are target numbers from the project brief, not
-measurements produced in this local environment. Replace them with actual run outputs
-after training on Colab or another GPU machine.
